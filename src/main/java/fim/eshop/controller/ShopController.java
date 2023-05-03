@@ -94,22 +94,30 @@ public class ShopController {
         Item selectedItem = view.getSelectedItem();
         int quantity = view.getSelectedQuantity();
         if (selectedItem != null && quantity > 0) {
-            shop.addToCart(selectedItem, quantity);
-            List<Item> cartItems = shop.getCartItems();
-            double totalPrice = 0;
+            int availableQuantity = selectedItem.getQuantity();
+            int existingCartItemQuantity = shop.getShoppingCart().getItemQuantity(selectedItem);
 
-            DefaultTableModel model = (DefaultTableModel) view.getCartItemsTable().getModel();
-            model.setRowCount(0);
-            for (Item item : cartItems) {
-                model.addRow(new Object[]{
-                        item.getId(),
-                        item.getName(),
-                        item.getPrice(),
-                        item.getQuantity(),
-                });
-                totalPrice += item.getPrice() * item.getQuantity();
+            if (quantity + existingCartItemQuantity <= availableQuantity) {
+                shop.addToCart(selectedItem, quantity);
+                List<Item> cartItems = shop.getCartItems();
+                double totalPrice = 0;
+
+                DefaultTableModel model = (DefaultTableModel) view.getCartItemsTable().getModel();
+                model.setRowCount(0);
+                for (Item item : cartItems) {
+                    model.addRow(new Object[]{
+                            item.getId(),
+                            item.getName(),
+                            item.getPrice(),
+                            item.getQuantity(),
+                    });
+                    totalPrice += item.getPrice() * item.getQuantity();
+                }
+                view.getTotalLabel().setText("Total: " + String.format("%.2f", totalPrice) + " €");
+            } else {
+                // Show a warning message when the selected quantity plus the existing cart item quantity is greater than the available quantity
+                JOptionPane.showMessageDialog(view, "The total quantity in the cart for the selected item is greater than the available stock quantity. Please select a lower quantity.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            view.getTotalLabel().setText("Total: " + String.format("%.2f", totalPrice) + " €");
         } else {
             JOptionPane.showMessageDialog(view, "Please select an item and enter a valid quantity.", "Error", JOptionPane.ERROR_MESSAGE);
         }

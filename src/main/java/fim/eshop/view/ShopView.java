@@ -43,7 +43,6 @@ public class ShopView extends JFrame {
         mergeButton = new JButton("Merge");
         contactButton = new JButton("Contact");
         printReceiptButton = new JButton("Print Receipt");
-        addToCartButton = new JButton("Add to cart");
         removeFromCartButton = new JButton("Remove from cart");
         saveToFileButton = new JButton("Save to file");
         loadFromFileButton = new JButton("Load from file");

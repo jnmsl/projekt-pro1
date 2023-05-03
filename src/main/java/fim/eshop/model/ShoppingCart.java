@@ -15,9 +15,20 @@ public class ShoppingCart {
     }
 
     public void addItem(Item item, int quantity) {
-        // Create a new Item instance to avoid modifying the original item in the stock
-        Item itemInCart = new Item(item.getId(), item.getName(), item.getPrice(), quantity);
-        items.add(itemInCart);
+        boolean itemExists = false;
+
+        for (Item cartItem : items) {
+            if (cartItem.getId() == item.getId()) {
+                cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                itemExists = true;
+                break;
+            }
+        }
+
+        if (!itemExists) {
+            Item newItem = new Item(item.getId(), item.getName(), item.getPrice(), quantity);
+            items.add(newItem);
+        }
     }
 
     public void removeItem(Item item) {
@@ -34,6 +45,15 @@ public class ShoppingCart {
             total += item.getPrice() * item.getQuantity();
         }
         return total;
+    }
+
+    public int getItemQuantity(Item item) {
+        for (Item cartItem : items) {
+            if (cartItem.getId() == item.getId()) {
+                return cartItem.getQuantity();
+            }
+        }
+        return 0;
     }
 }
 
