@@ -1,7 +1,13 @@
 package fim.eshop.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.List;
+
 
 public class Shop implements Serializable {
     private Stock stock;
@@ -35,35 +41,28 @@ public class Shop implements Serializable {
     }
 
     public void saveToFile(File file) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-            oos.writeObject(stock);
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(stock, fileWriter);
         }
     }
 
     public void loadFromFile(File file) throws IOException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            Object obj = ois.readObject();
-            if (obj instanceof Stock) {
-                stock = (Stock) obj;
-            } else {
-                throw new IOException("Invalid data format in the file.");
-            }
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Failed to load data from the file.", e);
+        try (FileReader fileReader = new FileReader(file)) {
+            Gson gson = new Gson();
+            Type stockType = new TypeToken<Stock>() {
+            }.getType();
+            stock = gson.fromJson(fileReader, stockType);
         }
     }
 
     public void mergeFile(File file) throws IOException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            Object obj = ois.readObject();
-            if (obj instanceof Stock) {
-                Stock mergedStock = (Stock) obj;
-                stock.merge(mergedStock);
-            } else {
-                throw new IOException("Invalid data format in the file.");
-            }
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Failed to merge data from the file.", e);
+        try (FileReader fileReader = new FileReader(file)) {
+            Gson gson = new Gson();
+            Type stockType = new TypeToken<Stock>() {
+            }.getType();
+            Stock mergedStock = gson.fromJson(fileReader, stockType);
+            stock.merge(mergedStock);
         }
     }
 }
